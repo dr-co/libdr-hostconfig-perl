@@ -5,7 +5,7 @@ Maintainer: Dmitry E. Oboukhov <unera@debian.org>
 Build-Depends: debhelper (>= 8)
 Build-Depends-Indep: perl,
     libhash-merge-simple-perl
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Homepage: http://search.cpan.org/dist/DR-HostConfig/
 
 Package: libdr-hostconfig-perl
