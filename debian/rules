@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+
+vdeb = $(shell dpkg-parsechangelog \
+        | grep ^Version|awk '{print $$2}'|sed 's/-[[:digit:]]\+$$//')
+vmod = $(shell grep '^our[[:space:]]\+$$VERSION' lib/DR/HostConfig.pm \
+        |head -n 1 |awk '{print $$4}'|sed "s/[';']//g" )
+pkt = $(shell dpkg-parsechangelog|grep ^Source|awk '{print $$2}')
+
+%:
+	dh $@
+
+override_dh_install:
+	test $(vdeb) = $(vmod)
+	dh_install

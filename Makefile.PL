@@ -6,9 +6,7 @@ WriteMakefile(
     PREREQ_PM         => {
             'Carp'                          => 0,
             'Mouse'                         => 0,
-            'DR::Tarantool'                 => 0,
-            'Coro'                          => 0,
-            'JSON::XS'                      => 0,
+            'Hash::Merge::Simple'           => 0,
     },
     META_MERGE => {
         resources => {

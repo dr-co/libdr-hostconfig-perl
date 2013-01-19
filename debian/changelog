@@ -1,0 +1,5 @@
+libdr-hostconfig-perl (0.02) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 20 Jan 2013 01:41:34 +0400
