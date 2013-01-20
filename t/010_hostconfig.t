@@ -43,6 +43,7 @@ is $config->utime_host, 0, 'Для ненайденного хостконфиг
 
 $ENV{HOSTNAME} = 'test';
 $config = DR::HostConfig->new(dir => "$FindBin::Bin/test-config");
+isa_ok $config->data => 'HASH', 'data';
 
 ok $config->utime_main, 'Время последнего обновления основного файла';
 ok $config->utime_host, 'Время последнего обновления хостового файла';
@@ -89,16 +90,6 @@ SKIP: {
     $config->set( $key => $old . '_SOMETHING_ELSE_' );
     my $new = $config->get( $key );
     ok $new eq $old . '_SOMETHING_ELSE_', "Параметр '$key' изменен";
-}
-
-note 'Проверка экпорта и синглетона';
-SKIP: {
-    skip 'Конфигурация пуста', 1 unless %{ $config->data };
-
-    my @keys = keys $config->data;
-    my $key = shift @keys;
-    DR::HostConfig->import(dir => "$FindBin::Bin/test-config");
-    ok cfg( $key ), "Параметр '$key' получен";
 }
 
 =head1 COPYRIGHT

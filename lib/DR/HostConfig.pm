@@ -3,9 +3,6 @@ use utf8;
 package DR::HostConfig;
 use Mouse;
 use namespace::autoclean;
-extends qw(Exporter);
-
-our @EXPORT = our @EXPORT_OK = qw(cfg);
 
 use Carp;
 use Encode                  qw(decode_utf8);
@@ -14,7 +11,7 @@ use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           qw(hostname);
 use Hash::Merge::Simple;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =encoding utf-8
 
@@ -53,57 +50,10 @@ If any config is changed the module will reload them.
 
   my $cfg = DR::HostConfig->new;
   $cfg->get('path.to.parameter');
-  $cfg->set('path.to.parameter' => 111);
+  $cfg->set('path.to.parameter' => 123);
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
-=cut
-
-=head2 cfg $path, $value
-
-main accessor. get/set config value.
-set isn't write to disk.
-
-    # example config
-    {
-        a => { b => 'c' }
-    }
-
-    my $v = cfg('a');   # returns { b => 'c' }
-    my $v = cfg('a.b'); # returns 'c'
-    my $v = cfg('abc'); # throws exception
-
-=cut
-{
-
-    my $imported_dir;
-    my %cfg;
-    sub cfg {
-        my ($path, $value) = @_;
-
-        $cfg{$$} //= __PACKAGE__->new(
-            ($imported_dir ? ( dir => $imported_dir) : () ),
-        );
-
-        if( defined $value ) {
-            return $cfg{$$}->set($path, $value);
-        } else {
-            return $cfg{$$}->get($path);
-        }
-    }
-
-    sub import {
-        my ($class, @args) = @_;
-        for (reverse 0 .. $#args - 1) {
-            next if $args[$_] ne 'dir';
-            $imported_dir = $args[$_ + 1];
-            splice @args, $_, 2;
-            delete $cfg{$$};
-        }
-        $class->export_to_level(1, $class, @args);
-    }
-
-}
 
 =head2 dir
 
@@ -143,8 +93,11 @@ has 'path_main' => ( is => 'ro', isa => 'Str',
 
 =cut
 
-has hostname => is => 'rw', isa => 'Str',
-    default => sub { $ENV{HOSTNAME} || hostname };
+has hostname =>
+    is          => 'rw',
+    isa         => 'Str',
+    lazy        => 1,
+    builder     => sub { $ENV{HOSTNAME} || hostname };
 
 =head2 path_host
 
@@ -152,13 +105,15 @@ has hostname => is => 'rw', isa => 'Str',
 
 =cut
 
-has 'path_host' => ( is => 'ro', isa => 'Str',
-    default => sub {
+has 'path_host' =>
+    is              => 'ro',
+    isa             => 'Str',
+    lazy            => 1,
+    builder         => sub {
         my ($self) = @_;
         my $path = catfile($self->dir, $self->hostname . '.cfg');
         return $path;
-    }
-);
+    };
 
 =head2 utime_main
 
@@ -166,12 +121,8 @@ has 'path_host' => ( is => 'ro', isa => 'Str',
 
 =cut
 
-has 'utime_main' => (is => 'rw', isa => 'Int',
-    default => sub {
-        my ($self) = @_;
-        return $self->get_utime_main;
-    }
-);
+has 'utime_main' => (is => 'rw', isa => 'Int', default => 0);
+
 
 =head2 utime_host
 
@@ -179,12 +130,8 @@ has 'utime_main' => (is => 'rw', isa => 'Int',
 
 =cut
 
-has 'utime_host' => (is => 'rw', isa => 'Int',
-    default => sub {
-        my ($self) = @_;
-        return $self->get_utime_host;
-    }
-);
+has 'utime_host' => (is => 'rw', isa => 'Int', default => 0);
+
 
 =head2 data
 
@@ -192,12 +139,8 @@ has 'utime_host' => (is => 'rw', isa => 'Int',
 
 =cut
 
-has 'data' => (is => 'ro', isa => 'HashRef', default => sub{
-    my ($self) = @_;
-    $self->load_main and $self->load_host and $self->merge
-            or warn 'Can not merge/reload configuration';
-    return $self->{data};
-});
+has 'data' => (is => 'ro', isa => 'HashRef', default => sub {{}});
+
 
 # Проверка и обновление конфигурации
 before 'data' => sub {
@@ -207,12 +150,45 @@ before 'data' => sub {
     return unless $self->check_need_update;
 
     # Обновление конфига если он устарел
-    if($self->is_changed_main or $self->is_changed_host) {
-        $self->load_main and $self->load_host and $self->merge
-            or warn 'Can not merge/reload configuration';
+    if ($self->is_changed_main or $self->is_changed_host) {
+        $self->reload_configs;
     }
     return;
 };
+
+
+=head2 reload_trigger
+
+Вызывается каждый раз после того как лоадер перечтет конфиги.
+
+нужен для того чтобы кто-то мог добавлять секции, которые отсутствуют
+в конфиге но нужны на деле (например приходят из другого источника
+
+=cut
+
+has 'reload_trigger' => is => 'ro', isa => 'CodeRef', default => sub { sub {} };
+
+
+=head1 METHODS
+
+=head2 reload_configs
+
+Перечитывает конфиги (безусловно)
+
+=cut
+
+sub reload_configs {
+    my ($self) = @_;
+
+    if ($self->load_main and $self->load_host) {
+        if ($self->merge) {
+            $self->reload_trigger->($self);
+        } else {
+            warn 'Can not merge/reload configuration';
+        }
+    }
+}
+
 
 =head2 load_main
 
@@ -222,8 +198,6 @@ before 'data' => sub {
 
 sub load_main {
     my ($self) = @_;
-
-    return 1 unless $self->path_main;
 
     # Получим конфигурацию из файла
     my $cfg = -r $self->path_main ? do $self->path_main : {};
@@ -241,6 +215,7 @@ sub load_main {
 
     # Сохраним полученную конфигурацию
     $self->{_main} = $cfg;
+    $self->utime_main( $self->get_utime_main );
 
     return 1;
 }
@@ -253,8 +228,6 @@ sub load_main {
 
 sub load_host {
     my ($self) = @_;
-
-    return 1 unless $self->path_host;
 
     # Получим конфигурацию из файла
     my $cfg = -r $self->path_host ? do $self->path_host : {};
@@ -271,6 +244,8 @@ sub load_host {
 
     # Сохраним полученную конфигурацию
     $self->{_host} = $cfg;
+
+    $self->utime_host( $self->get_utime_host );
 
     return 1;
 }
@@ -299,7 +274,6 @@ sub merge {
     delete $self->{_host};
     $self->{data} = $data;
     $self->{cache} = {};
-
     return 1;
 }
 
@@ -411,6 +385,7 @@ sub get_utime_host {
 
 sub is_changed_main {
     my ($self) = @_;
+
     my $old = $self->utime_main;
     my $new = $self->get_utime_main;
 
@@ -431,8 +406,6 @@ sub is_changed_main {
 sub is_changed_host {
     my ($self) = @_;
 
-    return 0 unless $self->path_host;
-
     my $old = $self->utime_host;
     my $new = $self->get_utime_host;
 
@@ -445,7 +418,7 @@ sub is_changed_host {
 }
 
 # Время последней проверки на обновление
-has last_update_time => is => 'rw', isa => 'Int', default => sub{ time };
+has last_update_time => is => 'rw', isa => 'Int', default => 0;
 # Таймаут для проверки на обновление
 has update_timeout   => is => 'rw', isa => 'Int', default => 10;
 

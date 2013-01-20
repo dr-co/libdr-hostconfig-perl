@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.03) nowtaxi; urgency=low
+
+  * New release: drop 'cfg' and singletone.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 20 Jan 2013 23:05:34 +0400
+
 libdr-hostconfig-perl (0.02) nowtaxi; urgency=low
 
   * Initial Release.
