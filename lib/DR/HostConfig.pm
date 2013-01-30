@@ -3,6 +3,7 @@ use utf8;
 package DR::HostConfig;
 use Mouse;
 use namespace::autoclean;
+extends qw(Exporter);
 
 use Carp;
 use Encode                  qw(decode_utf8);
@@ -11,7 +12,12 @@ use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           qw(hostname);
 use Hash::Merge::Simple;
 
-our $VERSION = '0.03';
+our $VERSION  = '0.04';
+
+# Force hostname
+our $HOSTNAME;
+# Froce base directory
+our $BASEDIR;
 
 =encoding utf-8
 
@@ -66,7 +72,7 @@ has 'dir' => ( is => 'ro', isa => 'Str',
         my ($self) = @_;
 
         my $dir = File::Spec->rel2abs(
-            catdir( dirname(dirname dirname __FILE__), 'config')
+            $BASEDIR // catdir( dirname(dirname dirname __FILE__), 'config')
         );
         warn "Can't find config directory: $dir\n", unless -d $dir;
         return $dir;
@@ -97,7 +103,7 @@ has hostname =>
     is          => 'rw',
     isa         => 'Str',
     lazy        => 1,
-    builder     => sub { $ENV{HOSTNAME} || hostname };
+    builder     => sub { $HOSTNAME // $ENV{HOSTNAME} // hostname };
 
 =head2 path_host
 
@@ -437,6 +443,24 @@ sub check_need_update {
         return 1;
     }
     return 0;
+}
+
+# Force variables
+sub import {
+    my ($package, @args) = @_;
+
+    for (0 .. $#args - 1) {
+        if ($args[$_] ~~ 'dir') {
+            (undef, $BASEDIR) = splice @args, $_, 2;
+            redo;
+        }
+        if ($args[$_] ~~ 'hostname') {
+            (undef, $HOSTNAME) = splice @args, $_, 2;
+            redo;
+        }
+    }
+
+    $package->export_to_level(1, $package, @args);
 }
 
 __PACKAGE__->meta->make_immutable();

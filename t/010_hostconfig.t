@@ -11,13 +11,6 @@ use Encode qw(decode encode);
 use FindBin;
 
 BEGIN {
-    # Подготовка объекта тестирования для работы с utf8
-    my $builder = Test::More->builder;
-    binmode $builder->output,         ":utf8";
-    binmode $builder->failure_output, ":utf8";
-    binmode $builder->todo_output,    ":utf8";
-
-    note "************* Тест модуля конфигурации *************";
     use_ok 'DR::HostConfig';
 }
 

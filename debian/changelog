@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.04) nowtaxi; urgency=low
+
+  * Add import varibles: hostname and dir
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Thu, 31 Jan 2013 02:42:39 +0400
+
 libdr-hostconfig-perl (0.03) nowtaxi; urgency=low
 
   * New release: drop 'cfg' and singletone.
