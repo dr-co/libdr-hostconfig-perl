@@ -24,7 +24,7 @@ sub dbh {
 =cut
 
 has tsql => is => 'ro', isa => 'Str', default => sub {
-    return rel2abs catfile dirname cfgdir, 'tsql';
+    return rel2abs catfile dirname(cfgdir), 'tsql';
 };
 
 =head2 dbi

@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.07) nowtaxi; urgency=low
+
+  * Fix paths
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Fri, 01 Feb 2013 02:08:26 +0400
+
 libdr-hostconfig-perl (0.06) nowtaxi; urgency=low
 
   * Remove namespace::autoclean
