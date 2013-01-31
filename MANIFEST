@@ -4,9 +4,14 @@ debian/control
 debian/copyright
 debian/rules
 debian/source/format
+.gitignore
 lib/DR/HostConfig.pm
+lib/DR/HostDBI.pm
 Makefile.PL
 MANIFEST
 t/010_hostconfig.t
+t/020_import.t
+t/030_singleton.t
+t/120_hostdbi.t
 t/test-config/main.cfg
 t/test-config/test.cfg

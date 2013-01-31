@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../../lib);
 
-use Test::More tests    => 28;
+use Test::More tests    => 29;
 use Encode qw(decode encode);
 use FindBin;
 
@@ -14,13 +14,7 @@ BEGIN {
     use_ok 'DR::HostConfig';
 }
 
-my $config;
-{
-    my $warns = 0;
-    local $SIG{__WARN__} = sub { $warns++; };
-    $config = DR::HostConfig->new;
-    is $warns, 1, 'Одно предупреждение';
-}
+my $config = DR::HostConfig->new;
 ok $config, 'Объект создан';
 
 note 'Проверка путей';
@@ -83,6 +77,14 @@ SKIP: {
     $config->set( $key => $old . '_SOMETHING_ELSE_' );
     my $new = $config->get( $key );
     ok $new eq $old . '_SOMETHING_ELSE_', "Параметр '$key' изменен";
+}
+
+note 'Отсутсвие файлов';
+{
+    my $config = DR::HostConfig->new(dir => 'unknown');
+    is eval{ $config->get('a'); 1 }, undef, 'Исключение на получение параметра';
+    is eval{ $config->set('a' => 'b'); 1 }, 1,
+        'Устанавливать параметры можно';
 }
 
 =head1 COPYRIGHT

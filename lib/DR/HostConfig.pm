@@ -5,14 +5,17 @@ use Mouse;
 use namespace::autoclean;
 extends qw(Exporter);
 
+our @EXPORT     = qw(cfg);
+our @EXPORT_OK  = qw(cfg cfgdir);
+
 use Carp;
 use Encode                  qw(decode_utf8);
-use File::Spec::Functions   qw(catdir catfile);
+use File::Spec::Functions   qw(catdir catfile rel2abs);
 use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           qw(hostname);
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.04';
+our $VERSION  = '0.05';
 
 # Force hostname
 our $HOSTNAME;
@@ -58,6 +61,47 @@ If any config is changed the module will reload them.
   $cfg->get('path.to.parameter');
   $cfg->set('path.to.parameter' => 123);
 
+=head1 EXPORTS
+
+=cut
+
+=head2 cfg $path, $value
+
+Main accessor. get/set config value. Set isn't write to disk.
+
+    # example config
+    {
+        a => { b => 'c' }
+    }
+
+    my $v = cfg('a');   # returns { b => 'c' }
+    my $v = cfg('a.b'); # returns 'c'
+    my $v = cfg('abc'); # throws exception
+
+=head2 cfgdir
+
+Return configuration directory
+
+=cut
+
+{
+    my $cfg;
+
+    sub cfg($;$) {
+        my ($name, $value) = @_;
+
+        $cfg = DR::HostConfig->new unless $cfg;
+
+        return $cfg->get( $name ) unless @_ > 1;
+        return $cfg->set( $name => $value );
+    }
+
+    sub cfgdir {
+        $cfg = DR::HostConfig->new unless $cfg;
+        return $cfg->dir;
+    }
+}
+
 =head1 ATTRIBUTES
 
 
@@ -70,10 +114,9 @@ If any config is changed the module will reload them.
 has 'dir' => ( is => 'ro', isa => 'Str',
     default => sub {
         my ($self) = @_;
-
-        my $dir = File::Spec->rel2abs(
-            $BASEDIR // catdir( dirname(dirname dirname __FILE__), 'config')
-        );
+        croak "Configuration directory is not defined\n"
+            unless defined $BASEDIR;
+        my $dir = rel2abs( $BASEDIR // $ENV{BASEDIR} );
         warn "Can't find config directory: $dir\n", unless -d $dir;
         return $dir;
     }
@@ -88,7 +131,7 @@ has 'dir' => ( is => 'ro', isa => 'Str',
 has 'path_main' => ( is => 'ro', isa => 'Str',
     default => sub {
         my ($self) = @_;
-        my $path = catfile($self->dir, 'main.cfg');
+        my $path = rel2abs catfile($self->dir, 'main.cfg');
         return $path;
     }
 );
@@ -117,7 +160,7 @@ has 'path_host' =>
     lazy            => 1,
     builder         => sub {
         my ($self) = @_;
-        my $path = catfile($self->dir, $self->hostname . '.cfg');
+        my $path = rel2abs catfile($self->dir, $self->hostname . '.cfg');
         return $path;
     };
 
