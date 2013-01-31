@@ -14,7 +14,7 @@ BEGIN {
     use_ok 'DR::HostConfig';
 }
 
-my $config = DR::HostConfig->new;
+my $config = DR::HostConfig->new(dir => '.');
 ok $config, 'Объект создан';
 
 note 'Проверка путей';
