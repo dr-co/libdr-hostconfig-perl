@@ -2,7 +2,6 @@ use utf8;
 
 package DR::HostConfig;
 use Mouse;
-use namespace::autoclean;
 extends qw(Exporter);
 
 our @EXPORT     = qw(cfg);
@@ -15,7 +14,7 @@ use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           qw(hostname);
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.05';
+our $VERSION  = '0.06';
 
 # Force hostname
 our $HOSTNAME;
@@ -96,7 +95,7 @@ Return configuration directory
         return $cfg->set( $name => $value );
     }
 
-    sub cfgdir {
+    sub cfgdir() {
         $cfg = DR::HostConfig->new unless $cfg;
         return $cfg->dir;
     }
