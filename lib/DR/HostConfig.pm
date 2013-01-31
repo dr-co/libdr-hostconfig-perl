@@ -1,8 +1,8 @@
 use utf8;
 
 package DR::HostConfig;
+use base qw(Exporter);
 use Mouse;
-extends qw(Exporter);
 
 our @EXPORT     = qw(cfg);
 our @EXPORT_OK  = qw(cfg cfgdir);
@@ -11,7 +11,7 @@ use Carp;
 use Encode                  qw(decode_utf8);
 use File::Spec::Functions   qw(catdir catfile rel2abs);
 use File::Basename          qw(dirname fileparse);
-use Sys::Hostname           qw(hostname);
+use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
 our $VERSION  = '0.06';
@@ -145,7 +145,7 @@ has hostname =>
     is          => 'rw',
     isa         => 'Str',
     lazy        => 1,
-    builder     => sub { $HOSTNAME // $ENV{HOSTNAME} // hostname };
+    builder     => sub {$HOSTNAME // $ENV{HOSTNAME} // Sys::Hostname::hostname};
 
 =head2 path_host
 
