@@ -14,12 +14,15 @@ use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.08';
+our $VERSION  = '0.09';
 
 # Force hostname
 our $HOSTNAME;
 # Froce base directory
 our $BASEDIR;
+
+# Config path delimiter
+our $SEPARATOR = qr{\W+}o;
 
 =encoding utf-8
 
@@ -149,7 +152,28 @@ has hostname =>
     is          => 'rw',
     isa         => 'Str',
     lazy        => 1,
-    builder     => sub {$HOSTNAME // $ENV{HOSTNAME} // Sys::Hostname::hostname};
+    builder     => sub {$HOSTNAME // $ENV{HOSTNAME} // Sys::Hostname::hostname},
+;
+
+# Обновление конфигурации
+around 'hostname' => sub {
+    my ($orig, $self, @args) = @_;
+
+    return $self->$orig(@args) unless @args;
+
+    my $new = $self->$orig(@args);
+
+    # Очистим путь к файлу хостового конфига чтоб он переопределился
+    $self->clear_path_host;
+    # Сбросим время последнего обновления файла конфига
+    $self->utime_host(0);
+    # Сбросим время последнего обновления конфига чтоб он перечитался
+    $self->last_update_time(0);
+    # Сбросим кеш
+    $self->{cache} = {};
+
+    return $new;
+};
 
 =head2 path_host
 
@@ -165,7 +189,9 @@ has 'path_host' =>
         my ($self) = @_;
         my $path = rel2abs catfile($self->dir, $self->hostname . '.cfg');
         return $path;
-    };
+    },
+    clearer     => 'clear_path_host',
+;
 
 =head2 utime_main
 
@@ -184,7 +210,6 @@ has 'utime_main' => (is => 'rw', isa => 'Int', default => 0);
 
 has 'utime_host' => (is => 'rw', isa => 'Int', default => 0);
 
-
 =head2 data
 
 Собственно конфигурация.
@@ -192,7 +217,6 @@ has 'utime_host' => (is => 'rw', isa => 'Int', default => 0);
 =cut
 
 has 'data' => (is => 'ro', isa => 'HashRef', default => sub {{}});
-
 
 # Проверка и обновление конфигурации
 before 'data' => sub {
@@ -343,7 +367,7 @@ sub get {
     return $self->{cache}{$path} if exists $self->{cache}{$path};
 
     # Сплитим по любым левым символам
-    my @keys = split m{[^\w+]}, $path;
+    my @keys = split $SEPARATOR, $path;
 
     my $param = $self->data;
     my $cpath = '';
@@ -378,7 +402,7 @@ sub set {
     croak 'valuse was not defined' unless @_ > 2;
 
     # Сплитим по любым левым символам
-    my @keys = split m{[^\w+]}, $path;
+    my @keys = split $SEPARATOR, $path;
     my $last = pop @keys;
 
     my $param = $self->data;

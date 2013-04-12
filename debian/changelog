@@ -1,3 +1,10 @@
+libdr-hostconfig-perl (0.09) nowtaxi; urgency=low
+
+  * Fix on fly reload on hostname changes
+  * Optimization for regexp key separator
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Sat, 13 Apr 2013 03:43:45 +0400
+
 libdr-hostconfig-perl (0.08) nowtaxi; urgency=low
 
   * Config object now accessible via cfgobj
