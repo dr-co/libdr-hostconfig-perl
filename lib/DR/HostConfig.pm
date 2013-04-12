@@ -5,7 +5,7 @@ use base qw(Exporter);
 use Mouse;
 
 our @EXPORT     = qw(cfg);
-our @EXPORT_OK  = qw(cfg cfgdir);
+our @EXPORT_OK  = qw(cfg cfgdir cfgobj);
 
 use Carp;
 use Encode                  qw(decode_utf8);
@@ -14,7 +14,7 @@ use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.07';
+our $VERSION  = '0.08';
 
 # Force hostname
 our $HOSTNAME;
@@ -98,6 +98,10 @@ Return configuration directory
     sub cfgdir() {
         $cfg = DR::HostConfig->new unless $cfg;
         return $cfg->dir;
+    }
+
+    sub cfgobj() {
+        return $cfg;
     }
 }
 
