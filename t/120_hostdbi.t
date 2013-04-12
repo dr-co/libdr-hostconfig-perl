@@ -6,13 +6,15 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests    => 12;
+use Test::More tests    => 15;
 use Encode qw(decode encode);
 use FindBin;
 
 BEGIN {
     use_ok 'DR::HostConfig', dir => "$FindBin::Bin/test-config";
-    use_ok 'DR::HostDBI';
+    use_ok 'DR::HostDBI', helpers => {
+        test    => sub {}
+    };
 }
 
 my $dbi = DR::HostDBI->new;
@@ -32,6 +34,10 @@ ok $opts->{RaiseError},         'Ошибки БД перехватываютс�
 ok $opts->{pg_enable_utf8},     'UTF8 включен';
 ok $opts->{dr_sql_dir},         'Директория шаблонов задана';
 ok $opts->{dr_decode_errors},   'Ошибки шаблонов';
+
+ok %DR::HostDBI::HELPERS, 'Хелперы присутствуют';
+isa_ok $DR::HostDBI::HELPERS{test}, 'CODE', 'Тестовый хелпер добавлен';
+can_ok $dbi, 'set_helper';
 
 #note 'Проверка работы с БД';
 #ok $dbi->handle, 'Подключение получено';

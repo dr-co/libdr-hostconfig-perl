@@ -4,17 +4,41 @@ package DR::HostDBI;
 use Mouse;
 extends qw(Exporter);
 
-our @EXPORT = our @EXPORT_OK = qw(dbh);
+our @EXPORT     = qw(dbh);
+our @EXPORT_OK  = qw(dbh tsqldir);
 
 use DBIx::DR;
 use DR::HostConfig          qw(cfg cfgdir);
 use File::Spec::Functions   qw(catfile rel2abs);
 use File::Basename          qw(dirname);
 
-sub dbh {
-    our %dbh;
-    $dbh{$$} //= __PACKAGE__->new;
-    return $dbh{$$}->handle;
+# Хелперы из импорта
+our %HELPERS;
+
+=head1 EXPORTS
+
+=head2 dbh
+
+DBI хендл
+
+=head2 tsqldir
+
+Путь к шаблонам
+
+=cut
+
+{
+    my %dbh;
+
+    sub dbh {
+        $dbh{$$} //= __PACKAGE__->new;
+        return $dbh{$$}->handle;
+    }
+
+    sub tsqldir {
+        $dbh{$$} //= __PACKAGE__->new;
+        return $dbh{$$}->tsql;
+    }
 }
 
 =head2 tsql
@@ -119,6 +143,9 @@ before 'handle' => sub {
     return if $self->{handle} and $self->{handle}{Active};
 
     $self->{handle} = DBIx::DR->connect( $self->dbi );
+
+    # Добавим хелперы из импорта
+    $self->{handle}->set_helper($_ => $HELPERS{$_}) for keys %HELPERS;
 };
 
 =head2 pgstring
@@ -163,6 +190,38 @@ sub tpgstring {
     eval { $str .= ' PGPORT=' . cfg 'tdb.port' };
 
     print "$str\n";
+}
+
+=head2 set_helper
+
+Добавляет хелпер в DBIx::DR
+
+=cut
+
+sub set_helper {
+    my ($self, $name => $sub) = @_;
+
+    # Добавим в текущий объект если он уже есть
+    $self->{handle}->set_helper($name => $sub) if $self->{handle};
+
+    # Добавим в общий список
+    $HELPERS{$name} = $sub;
+
+    return 1;
+}
+
+sub import {
+    my ($package, @args) = @_;
+
+    for (0 .. $#args - 1) {
+        if ($args[$_] ~~ 'helpers') {
+            my ($name, $helpers) = splice @args, $_, 2;
+            %HELPERS = (%HELPERS, %$helpers);
+            redo;
+        }
+    }
+
+    $package->export_to_level(1, $package, @args);
 }
 
 __PACKAGE__->meta->make_immutable();
