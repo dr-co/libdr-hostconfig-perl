@@ -5,7 +5,7 @@ use Mouse;
 extends qw(Exporter);
 
 our @EXPORT     = qw(dbh);
-our @EXPORT_OK  = qw(dbh tsqldir);
+our @EXPORT_OK  = qw(dbh tsqldir pgstring);
 
 use DBIx::DR;
 use DR::HostConfig          qw(cfg cfgdir);
@@ -72,7 +72,12 @@ has tsql => is => 'ro', isa => 'Str', default => sub {
 sub dbi {
     my ($self) = @_;
 
-    # Переключимся на вывод для тестовой БД если стоят переменные окружения
+    # Используем форсирование хостнеймов через переменные окружения
+    unless ($ENV{USE_HOST_DATABASE}) {
+        return $self->tdbi if $ENV{USE_TEST_DATABASE};
+    }
+
+    # Переключимся на вывод для тестовой БД если мы в тесте
     return $self->tdbi if $0 =~ /\.t$/;
 
     # Строка коннектора к БД
@@ -158,9 +163,13 @@ before 'handle' => sub {
 sub pgstring {
     my ($self) = @_;
 
+    # Используем форсирование хостнеймов через переменные окружения
     unless ($ENV{USE_HOST_DATABASE}) {
         goto \&tpgstring if $ENV{USE_TEST_DATABASE};
     }
+
+    # Переключимся на вывод для тестовой БД если мы в тесте
+    goto \&tpgstring if $0 =~ /\.t$/;
 
     my $str = '';
     $str .= 'PGHOST=' .         cfg 'db.host';

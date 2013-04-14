@@ -12,7 +12,7 @@ use FindBin;
 
 BEGIN {
     use_ok 'DR::HostConfig', dir => "$FindBin::Bin/test-config";
-    use_ok 'DR::HostDBI', helpers => {
+    use_ok 'DR::HostDBI', 'pgstring', helpers => {
         test    => sub {}
     };
 }
@@ -26,8 +26,8 @@ ok $dbi->tsql, 'Путь для шаблонов задан';
 note 'Проверка конфигурации';
 my ($str, $login, $password, $opts) = $dbi->dbi;
 ok $str,        'Строка подключения собрана';
-ok $login,      'Логин';
-ok $password,   'Пороль';
+is $login,      '111',   'Логин';
+is $password,   '222',   'Пороль';
 
 isa_ok $opts, 'HASH', 'Параметры';
 ok $opts->{RaiseError},         'Ошибки БД перехватываются';
