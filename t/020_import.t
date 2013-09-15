@@ -9,6 +9,7 @@ use lib qw(lib ../../lib);
 use Test::More tests    => 5;
 use Encode qw(decode encode);
 use FindBin;
+use experimental 'smartmatch';
 
 my $dir;
 

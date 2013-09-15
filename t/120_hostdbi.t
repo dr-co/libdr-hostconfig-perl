@@ -9,6 +9,7 @@ use lib qw(lib ../lib ../../lib);
 use Test::More tests    => 15;
 use Encode qw(decode encode);
 use FindBin;
+use experimental 'smartmatch';
 
 BEGIN {
     use_ok 'DR::HostConfig', dir => "$FindBin::Bin/test-config";

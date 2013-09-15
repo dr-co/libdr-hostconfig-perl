@@ -13,6 +13,7 @@ use File::Spec::Functions   qw(catdir catfile rel2abs);
 use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
+use experimental 'smartmatch';
 
 our $VERSION  = '0.10';
 

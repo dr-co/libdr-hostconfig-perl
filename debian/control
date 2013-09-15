@@ -5,14 +5,18 @@ Maintainer: Dmitry E. Oboukhov <unera@debian.org>
 Uploaders: Roman V. Nikolaev <rshadow@rambler.ru>
 Build-Depends: debhelper (>= 8)
 Build-Depends-Indep: perl,
-    libhash-merge-simple-perl
+    libhash-merge-simple-perl,
+    libmouse-perl,
+    libexperimental-perl
 Standards-Version: 3.9.3
 Homepage: http://search.cpan.org/dist/DR-HostConfig/
 
 Package: libdr-hostconfig-perl
 Architecture: all
 Depends: ${misc:Depends}, ${perl:Depends},
-    libhash-merge-simple-perl
+    libhash-merge-simple-perl,
+    libmouse-perl,
+    libexperimental-perl
 Description: host configuration loader
  The perl module loads main and host configs of your project,
  merge them and provides some accessors for loaded data.

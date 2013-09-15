@@ -11,6 +11,7 @@ use DBIx::DR;
 use DR::HostConfig          qw(cfg cfgdir);
 use File::Spec::Functions   qw(catfile rel2abs);
 use File::Basename          qw(dirname);
+use experimental 'smartmatch';
 
 # Хелперы из импорта
 our %HELPERS;
