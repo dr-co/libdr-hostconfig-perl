@@ -1,4 +1,4 @@
-libdr-hostconfig-perl (0.11) unstable; urgency=low
+libdr-hostconfig-perl (0.11) nowtaxi; urgency=low
 
   * Fix warnings with Perl 5.18.
 
