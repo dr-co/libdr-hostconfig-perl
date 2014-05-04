@@ -14,8 +14,7 @@ Package: libdr-hostconfig-perl
 Architecture: all
 Depends: ${misc:Depends}, ${perl:Depends},
     libhash-merge-simple-perl,
-    libmouse-perl,
-    libexperimental-perl
+    libmouse-perl
 Description: host configuration loader
  The perl module loads main and host configs of your project,
  merge them and provides some accessors for loaded data.

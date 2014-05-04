@@ -15,7 +15,7 @@ use Sys::Hostname           ();
 use Hash::Merge::Simple;
 use experimental 'smartmatch';
 
-our $VERSION  = '0.12';
+our $VERSION  = '0.13';
 
 # Force hostname
 our $HOSTNAME;
