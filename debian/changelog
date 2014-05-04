@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.12) nowtaxi; urgency=medium
+
+  * Drop libexperimental from depends.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 04 May 2014 19:37:15 +0400
+
 libdr-hostconfig-perl (0.11) nowtaxi; urgency=low
 
   * Fix warnings with Perl 5.18.

@@ -6,8 +6,7 @@ Uploaders: Roman V. Nikolaev <rshadow@rambler.ru>
 Build-Depends: debhelper (>= 8)
 Build-Depends-Indep: perl,
     libhash-merge-simple-perl,
-    libmouse-perl,
-    libexperimental-perl
+    libmouse-perl
 Standards-Version: 3.9.3
 Homepage: http://search.cpan.org/dist/DR-HostConfig/
 
