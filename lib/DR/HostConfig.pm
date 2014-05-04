@@ -13,9 +13,8 @@ use File::Spec::Functions   qw(catdir catfile rel2abs);
 use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
-use experimental 'smartmatch';
 
-our $VERSION  = '0.13';
+our $VERSION  = '0.14';
 
 # Force hostname
 our $HOSTNAME;
@@ -521,11 +520,11 @@ sub import {
     my ($package, @args) = @_;
 
     for (0 .. $#args - 1) {
-        if ($args[$_] ~~ 'dir') {
+        if ($args[$_] and $args[$_] eq 'dir') {
             (undef, $BASEDIR) = splice @args, $_, 2;
             redo;
         }
-        if ($args[$_] ~~ 'hostname') {
+        if ($args[$_] and $args[$_] eq 'hostname') {
             (undef, $HOSTNAME) = splice @args, $_, 2;
             redo;
         }

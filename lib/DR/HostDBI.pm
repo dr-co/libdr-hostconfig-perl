@@ -11,7 +11,6 @@ use DBIx::DR;
 use DR::HostConfig          qw(cfg cfgdir);
 use File::Spec::Functions   qw(catfile rel2abs);
 use File::Basename          qw(dirname);
-use experimental 'smartmatch';
 
 # Хелперы из импорта
 our %HELPERS;
@@ -224,7 +223,7 @@ sub import {
     my ($package, @args) = @_;
 
     for (0 .. $#args - 1) {
-        if ($args[$_] ~~ 'helpers') {
+        if ($args[$_] and $args[$_] eq 'helpers') {
             my ($name, $helpers) = splice @args, $_, 2;
             %HELPERS = (%HELPERS, %$helpers);
             redo;
