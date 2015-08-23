@@ -15,7 +15,10 @@ WriteMakefile(
         }
     },
     ABSTRACT_FROM  => 'lib/DR/HostConfig.pm',
-    AUTHOR         => 'Dmitry E. Oboukhov <unera@debian.org>',
+    AUTHOR          => [
+        'Dmitry E. Oboukhov <unera@debian.org>,',
+        'Roman V. Nikolaev <rshadow@rambler.ru>',
+    ],
     LICENSE           => 'perl',
 );
 

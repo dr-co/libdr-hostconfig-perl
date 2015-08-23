@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.15) nowtaxi; urgency=medium
+
+  * Fix copyright
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Sun, 23 Aug 2015 23:21:42 +0300
+
 libdr-hostconfig-perl (0.14) nowtaxi; urgency=medium
 
   * Warnings, perl 5.18.
