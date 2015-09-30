@@ -98,6 +98,7 @@ sub dbi {
             pg_enable_utf8      => 1,
             dr_sql_dir          => $self->tsql,
             dr_decode_errors    => 1,
+            pg_server_prepare   => 0,
         }
     );
 }
@@ -129,6 +130,7 @@ sub tdbi {
             pg_enable_utf8      => 1,
             dr_sql_dir          => $self->tsql,
             dr_decode_errors    => 1,
+            pg_server_prepare   => 1,
         }
     );
 }
