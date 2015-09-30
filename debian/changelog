@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.16) nowtaxi; urgency=medium
+
+  * Only . or / or :: separators allowed. 
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 30 Sep 2015 18:15:16 +0300
+
 libdr-hostconfig-perl (0.15) nowtaxi; urgency=medium
 
   * Fix copyright

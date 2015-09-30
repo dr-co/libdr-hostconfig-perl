@@ -14,7 +14,7 @@ use File::Basename          qw(dirname fileparse);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.15';
+our $VERSION  = '0.16';
 
 # Force hostname
 our $HOSTNAME;
@@ -22,7 +22,7 @@ our $HOSTNAME;
 our $BASEDIR;
 
 # Config path delimiter
-our $SEPARATOR = qr{\W+}o;
+our $SEPARATOR = qr{\.|/|::}o;
 
 =encoding utf-8
 
