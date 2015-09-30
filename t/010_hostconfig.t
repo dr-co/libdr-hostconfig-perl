@@ -74,7 +74,7 @@ note 'Получение параметров';
     SKIP: {
         skip 'Конфигурация пуста', 1 unless %{ $config->data };
 
-        my @keys = keys $config->data;
+        my @keys = keys %{ $config->data };
         my $key = shift @keys;
         ok $config->get( $key ), "Параметр '$key' получен";
     }
@@ -88,7 +88,7 @@ note 'Изменение параметров';
     SKIP: {
         skip 'Конфигурация пуста', 2 unless %{ $config->data };
 
-        my @keys = keys $config->data;
+        my @keys = keys %{ $config->data };
         my $key = shift @keys;
         my $old = $config->get( $key );
         ok $old, "Параметр '$key' получен";

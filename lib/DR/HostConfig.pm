@@ -22,7 +22,7 @@ our $HOSTNAME;
 our $BASEDIR;
 
 # Config path delimiter
-our $SEPARATOR = qr{\W+}o;
+our $SEPARATOR = qr{\.|/|::}o;
 
 =encoding utf-8
 
