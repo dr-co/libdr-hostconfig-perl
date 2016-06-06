@@ -10,16 +10,19 @@ our @EXPORT_OK  = qw(cfg cfgdir cfgobj);
 use Carp;
 use Encode                  qw(decode_utf8);
 use File::Spec::Functions   qw(catdir catfile rel2abs);
-use File::Basename          qw(dirname fileparse);
+use File::Basename          qw(dirname fileparse basename);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.17';
+our $VERSION  = '0.18';
 
 # Force hostname
 our $HOSTNAME;
-# Froce base directory
+# Force base directory
 our $BASEDIR;
+
+# Project directory
+our $PROJECTDIR;
 
 # Config path delimiter
 our $SEPARATOR = qr{\.|/|::}o;
@@ -128,6 +131,21 @@ has 'dir' => ( is => 'ro', isa => 'Str',
     }
 );
 
+
+=head2 project_dir
+
+Название директории с проектом
+
+=cut
+
+has project_dir => is => 'ro', isa => 'Str',
+    default => sub {
+        my ($self) = @_;
+        return rel2abs($PROJECTDIR  // dirname(dirname $self->dir));
+    };
+
+
+
 =head2 path_main
 
 Путь к основному файлу конфигурации
@@ -193,6 +211,16 @@ has 'path_host' =>
     clearer     => 'clear_path_host',
 ;
 
+has path_project    =>
+    is              => 'ro',
+    isa             => 'Str',
+    lazy            => 1,
+    builder         => sub {
+        my ($self) = @_;
+        return rel2abs catfile($self->dir,
+            sprintf "by-dir-%s.cfg", basename($self->project_dir));
+    };
+
 =head2 utime_main
 
 Время последнего обновления основного конфига
@@ -200,6 +228,15 @@ has 'path_host' =>
 =cut
 
 has 'utime_main' => (is => 'rw', isa => 'Int', default => 0);
+
+
+=head2 utime_project
+
+Время последнего обновления конфига проекта
+
+=cut
+
+has utime_project => (is => 'rw', isa => 'Int', default => 0);
 
 
 =head2 utime_host
@@ -226,7 +263,7 @@ before 'data' => sub {
     return unless $self->check_need_update;
 
     # Обновление конфига если он устарел
-    if ($self->is_changed_main or $self->is_changed_host) {
+    if ($self->is_changed_main or $self->is_changed_host or $self->is_changed_project) {
         $self->reload_configs;
     }
     return;
@@ -256,7 +293,7 @@ has 'reload_trigger' => is => 'ro', isa => 'CodeRef', default => sub { sub {} };
 sub reload_configs {
     my ($self) = @_;
 
-    if ($self->load_main and $self->load_host) {
+    if ($self->load_main and $self->load_host and $self->load_project) {
         if ($self->merge) {
             $self->reload_trigger->($self);
         } else {
@@ -326,6 +363,37 @@ sub load_host {
     return 1;
 }
 
+
+=head2 load_project
+
+Загрузка проектного файла конфигурации
+
+=cut
+
+sub load_project {
+    my ($self) = @_;
+
+    # Получим конфигурацию из файла
+    my $cfg = -r $self->path_project ? do $self->path_project : {};
+    if ($@) {
+        warn "Error parse " . $self->path_project . " : " . decode_utf8 $@;
+        $self->{_project} = {};
+        return 0;
+    }
+    unless('HASH' eq ref $cfg) {
+        warn $self->path_project . " doesn't contain HASHREF";
+        $self->{_project} = {};
+        return 0;
+    }
+
+    # Сохраним полученную конфигурацию
+    $self->{_project} = $cfg;
+
+    $self->utime_project( $self->get_utime_project );
+
+    return 1;
+}
+
 =head2 merge
 
 Объединение загруженной основной и хостовой конфигураций
@@ -339,7 +407,10 @@ sub merge {
 
     $self->{data} //= {};
     my $data = eval {
-        Hash::Merge::Simple::merge $self->{_main}, $self->{_host};
+        Hash::Merge::Simple::merge
+            $self->{_main},
+            $self->{_host},
+            $self->{_project};
     };
     if( $@ ) {
         warn "Can't merge configs: " . decode_utf8 $@;
@@ -348,6 +419,7 @@ sub merge {
 
     delete $self->{_main};
     delete $self->{_host};
+    delete $self->{_project};
     $self->{data} = $data;
     $self->{cache} = {};
     return 1;
@@ -453,6 +525,19 @@ sub get_utime_host {
     return (stat $self->path_host )[10];
 }
 
+
+=head2 get_utime_project
+
+Получение времени последнего обновления проектного файла конфигурации
+
+=cut
+
+sub get_utime_project {
+    my ($self) = @_;
+    return 0 unless -f $self->path_project;
+    return (stat $self->path_project )[10];
+}
+
 =head2 is_changed_main
 
 Проверка изменения основного файла конфигурации
@@ -467,6 +552,26 @@ sub is_changed_main {
 
     if( $new > $old ) {
         $self->utime_main($new);
+        return 1;
+    }
+
+    return 0;
+}
+
+=head2 is_changed_project
+
+Проверка изменения проектного файла конфигурации
+
+=cut
+
+sub is_changed_project {
+    my ($self) = @_;
+
+    my $old = $self->utime_project;
+    my $new = $self->get_utime_project;
+    
+    if( $new > $old ) {
+        $self->utime_project($new);
         return 1;
     }
 
@@ -526,6 +631,11 @@ sub import {
         }
         if ($args[$_] and $args[$_] eq 'hostname') {
             (undef, $HOSTNAME) = splice @args, $_, 2;
+            redo;
+        }
+
+        if ($args[$_] and $args[$_] eq 'project') {
+            (undef, $PROJECTDIR) = splice @args, $_, 2;
             redo;
         }
     }
