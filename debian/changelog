@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.20) nowtaxi; urgency=medium
+
+  * Use our(dbh) instead my(dbh) for mod_per/apache.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 27 Jun 2016 17:37:49 +0300
+
 libdr-hostconfig-perl (0.19) nowtaxi; urgency=medium
 
   * Add disconnect handler for dbh connections.
