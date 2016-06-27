@@ -27,23 +27,21 @@ DBI хендл
 
 =cut
 
-{
-    my %dbh;
+our %dbh;
 
-    sub dbh {
-        $dbh{$$} //= __PACKAGE__->new;
-        return $dbh{$$}->handle;
-    }
+sub dbh {
+    $dbh{$$} //= __PACKAGE__->new;
+    return $dbh{$$}->handle;
+}
 
-    sub tsqldir {
-        $dbh{$$} //= __PACKAGE__->new;
-        return $dbh{$$}->tsql;
-    }
+sub tsqldir {
+    $dbh{$$} //= __PACKAGE__->new;
+    return $dbh{$$}->tsql;
+}
 
-    END {
-        if (my $this_host_handle = $dbh{$$}) {
-            $this_host_handle->handle->disconnect;
-        }
+END {
+    if (my $this_host_handle = $dbh{$$}) {
+        $this_host_handle->handle->disconnect;
     }
 }
 
