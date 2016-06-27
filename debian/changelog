@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.19) nowtaxi; urgency=medium
+
+  * Add disconnect handler for dbh connections.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 27 Jun 2016 13:06:01 +0300
+
 libdr-hostconfig-perl (0.18) nowtaxi; urgency=medium
 
   * dir configs. 

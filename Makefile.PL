@@ -22,5 +22,5 @@ WriteMakefile(
     LICENSE           => 'perl',
 );
 
-open my $file, '>>', 'Makefile';
-print $file "\n\nTEST_VERBOSE = 1\n";
+# open my $file, '>>', 'Makefile';
+# print $file "\n\nTEST_VERBOSE = 1\n";

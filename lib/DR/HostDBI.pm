@@ -39,6 +39,12 @@ DBI хендл
         $dbh{$$} //= __PACKAGE__->new;
         return $dbh{$$}->tsql;
     }
+
+    END {
+        if (my $this_host_handle = $dbh{$$}) {
+            $this_host_handle->handle->disconnect;
+        }
+    }
 }
 
 =head2 tsql

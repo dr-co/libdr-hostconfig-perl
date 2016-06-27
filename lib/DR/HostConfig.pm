@@ -14,7 +14,7 @@ use File::Basename          qw(dirname fileparse basename);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.18';
+our $VERSION  = '0.19';
 
 # Force hostname
 our $HOSTNAME;
