@@ -89,6 +89,12 @@ sub dbi {
         cfg('db.name'),
         cfg('db.host'),
         eval { cfg('db.port') } || 5432;
+    
+    my $dbs = cfg 'db';
+    my $opts = {};
+    if (exists $dbs->{opts}) {
+        $opts = $dbs->{opts};
+    }
 
     # Вернем массив параметров для подключения
     return (
@@ -103,6 +109,7 @@ sub dbi {
             dr_sql_dir          => $self->tsql,
             dr_decode_errors    => 1,
             pg_server_prepare   => 0,
+            %$opts
         }
     );
 }
@@ -122,6 +129,12 @@ sub tdbi {
         cfg('tdb.host'),
         eval { cfg('tdb.port') } || 5432;
 
+    my $dbs = cfg 'tdb';
+    my $opts = {};
+    if (exists $dbs->{opts}) {
+        $opts = $dbs->{opts};
+    }
+
     # Вернем массив параметров для подключения
     return (
         $str,
@@ -135,6 +148,7 @@ sub tdbi {
             dr_sql_dir          => $self->tsql,
             dr_decode_errors    => 1,
             pg_server_prepare   => 1,
+            %$opts
         }
     );
 }

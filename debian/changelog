@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.21) nowtaxi; urgency=medium
+
+  * Allow use db/tdb options for DBD::Pg.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 26 Feb 2017 10:57:45 +0400
+
 libdr-hostconfig-perl (0.20) nowtaxi; urgency=medium
 
   * Use our(dbh) instead my(dbh) for mod_per/apache.
