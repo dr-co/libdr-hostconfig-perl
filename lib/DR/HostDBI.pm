@@ -90,7 +90,7 @@ sub dbi {
         cfg('db.host'),
         eval { cfg('db.port') } || 5432;
     
-    my $dbs = cfg 'db';
+    my $dbs = cfg('db');
     my $opts = {};
     if (exists $dbs->{opts}) {
         $opts = $dbs->{opts};
@@ -129,7 +129,7 @@ sub tdbi {
         cfg('tdb.host'),
         eval { cfg('tdb.port') } || 5432;
 
-    my $dbs = cfg 'tdb';
+    my $dbs = cfg('tdb');
     my $opts = {};
     if (exists $dbs->{opts}) {
         $opts = $dbs->{opts};
