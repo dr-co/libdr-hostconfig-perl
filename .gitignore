@@ -1,1 +1,6 @@
 .project
+debian/*
+MYMETA.*
+Makefile
+blib
+pm_to_blib
