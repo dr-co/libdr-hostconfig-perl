@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests    => 15;
+use Test::More tests    => 23;
 use Encode qw(decode encode);
 use FindBin;
 use experimental 'smartmatch';
@@ -39,6 +39,30 @@ ok $opts->{dr_decode_errors},   'Ошибки шаблонов';
 ok %DR::HostDBI::HELPERS, 'Хелперы присутствуют';
 isa_ok $DR::HostDBI::HELPERS{test}, 'CODE', 'Тестовый хелпер добавлен';
 can_ok $dbi, 'set_helper';
+
+
+{
+    my $out = '';
+
+    my $oldout;
+
+    ok open($oldout, ">&", \*STDOUT), 'dup stdout';
+    ok close(STDOUT), 'close STDOUT';
+    ok open(STDOUT, '>', \$out), 'redirect stdout';
+
+    print "bbb\n";
+    like $out => qr{bbb}, 'print stdout to inmemory';
+
+    ok pgstring(), 'pgstring';
+
+    ok close(STDOUT), 'close inmemory STDOUT';
+    ok open(STDOUT, '>&', $oldout), 'reopen standard STDOUT';
+
+    like $out,
+        qr{PGHOST=.*PGUSER=.*PGPASSWORD=.*PGDATABASE=.*PGPORT=\d+},
+        'pgstring output';
+
+}
 
 #note 'Проверка работы с БД';
 #ok $dbi->handle, 'Подключение получено';
