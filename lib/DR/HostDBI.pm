@@ -44,10 +44,7 @@ sub dbh(;$$) {
     $cfg_section //= 'db';
     $connection //= 'default';
 
-   
     $dbh{$$} //= {};
-    return $dbh{$$}{$connection} if exists $dbh{$$}{$connection};
-
     $dbh{$$}{$connection} //= __PACKAGE__->new(section => $cfg_section);
     return $dbh{$$}{$connection}->handle;
 }
@@ -114,18 +111,18 @@ sub dbi {
     my $section = $self->section;
 
     $section = $TEST_PREFIX . $section if $INTEST;
-    
+
     my $cfg = cfg($section);
     for (qw(name host login password)) {
         die "Секция конфига $section.$_ не определена" unless exists $cfg->{$_};
     }
-    
+
     # Строка коннектора к БД
     my $str = sprintf "dbi:Pg:dbname=%s;host=%s;port=%s",
         $cfg->{name},
         $cfg->{host},
         $cfg->{port} || 5432;
-    
+
     # Вернем массив параметров для подключения
     return (
         $str,
