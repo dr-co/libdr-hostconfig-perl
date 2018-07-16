@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.25) nowtaxi; urgency=medium
+
+  * Fix destructor
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Mon, 16 Jul 2018 18:45:39 +0300
+
 libdr-hostconfig-perl (0.24) nowtaxi; urgency=medium
 
   * Fix many connections support

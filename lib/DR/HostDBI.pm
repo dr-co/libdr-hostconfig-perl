@@ -53,8 +53,10 @@ sub dbh(;$$) {
 
 END {
     if (my $this_host_handle = $dbh{$$}) {
-        for (values %$this_host_handle) {
-            $_->handle->disconnect;
+        for my $section (values %$this_host_handle) {
+            for my $connection (values %$section) {
+                $connection->handle->disconnect;
+            }
         }
     }
 }
