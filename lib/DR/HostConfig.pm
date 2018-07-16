@@ -14,7 +14,7 @@ use File::Basename          qw(dirname fileparse basename);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.23';
+our $VERSION  = '0.24';
 
 # Force hostname
 our $HOSTNAME;
@@ -569,7 +569,7 @@ sub is_changed_project {
 
     my $old = $self->utime_project;
     my $new = $self->get_utime_project;
-    
+
     if( $new > $old ) {
         $self->utime_project($new);
         return 1;

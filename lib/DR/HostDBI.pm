@@ -42,11 +42,13 @@ sub dbh(;$$) {
     my ($cfg_section, $connection) = @_;
 
     $cfg_section //= 'db';
-    $connection //= 'default';
+    $connection  //= 'default';
 
-    $dbh{$$} //= {};
-    $dbh{$$}{$connection} //= __PACKAGE__->new(section => $cfg_section);
-    return $dbh{$$}{$connection}->handle;
+    $dbh{$$}                            //= {};
+    $dbh{$$}{$cfg_section}              //= {};
+    $dbh{$$}{$cfg_section}{$connection} //=
+        __PACKAGE__->new(section => $cfg_section);
+    return $dbh{$$}{$cfg_section}{$connection}->handle;
 }
 
 END {

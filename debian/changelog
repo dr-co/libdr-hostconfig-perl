@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.24) nowtaxi; urgency=medium
+
+  * Fix many connections support
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Mon, 16 Jul 2018 18:34:34 +0300
+
 libdr-hostconfig-perl (0.23) nowtaxi; urgency=medium
 
   * Cleanup code, fix crash dbh.
