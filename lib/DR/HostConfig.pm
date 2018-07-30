@@ -14,7 +14,7 @@ use File::Basename          qw(dirname fileparse basename);
 use Sys::Hostname           ();
 use Hash::Merge::Simple;
 
-our $VERSION  = '0.25';
+our $VERSION  = '0.26';
 
 # Force hostname
 our $HOSTNAME;
@@ -174,7 +174,7 @@ has hostname =>
 ;
 
 # Обновление конфигурации
-around 'hostname' => sub {
+around [ 'hostname', 'get' ] => sub {
     my ($orig, $self, @args) = @_;
 
     return $self->$orig(@args) unless @args;

@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.26) nowtaxi; urgency=medium
+
+  * Fix: Config is ALWAYS reloading if file changed.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 30 Jul 2018 15:36:38 +0300
+
 libdr-hostconfig-perl (0.25) nowtaxi; urgency=medium
 
   * Fix destructor
