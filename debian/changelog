@@ -1,3 +1,9 @@
+libdr-hostconfig-perl (0.27) nowtaxi; urgency=medium
+
+  * Fix: Config reload if get/set accessor is called.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 31 Jul 2018 11:47:31 +0300
+
 libdr-hostconfig-perl (0.26) nowtaxi; urgency=medium
 
   * Fix: Config is ALWAYS reloading if file changed.

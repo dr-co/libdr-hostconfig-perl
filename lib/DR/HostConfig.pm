@@ -174,7 +174,7 @@ has hostname =>
 ;
 
 # Обновление конфигурации
-around [ 'hostname', 'get' ] => sub {
+around hostname => sub {
     my ($orig, $self, @args) = @_;
 
     return $self->$orig(@args) unless @args;
@@ -256,7 +256,7 @@ has 'utime_host' => (is => 'rw', isa => 'Int', default => 0);
 has 'data' => (is => 'ro', isa => 'HashRef', default => sub {{}});
 
 # Проверка и обновление конфигурации
-before 'data' => sub {
+before [ 'data', 'set', 'get' ] => sub {
     my ($self) = @_;
 
     # Проверим что требуется проверка изменения конфига
